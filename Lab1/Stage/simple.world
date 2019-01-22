@@ -1,0 +1,42 @@
+include "map.inc"
+include "sensors.inc"
+include "robot.inc"
+
+interval_sim 100	# update rate in ms
+resolution 0.02		# set the resolution of the underlying raytrace model in meters
+
+# configure the GUI window
+window
+(
+	
+	size [800.000 800.000]	# size of the window in pixels (x y)
+	scale 100				# how many pixels of the simulated environment equal 1m 
+	center [ 0  0 ]			# opening view point of map
+  	rotate [ 0  0 ]			# opening orientation of map
+  			
+  	show_data 1             # sensor data from robot (1=on 0=off)
+
+)
+
+# load an environment bitmap
+floorplan
+(
+#	bitmap "bitmaps/simple_rooms.png"	# bitmap to use for environment
+	bitmap "bitmaps/racetrack.png"
+	
+	size [6 6 0.5]				# size of the environment in metres (x y z)
+)
+
+# add an instance of a cleanerbot
+cleanerbot
+(
+#	pose [0 0 0 0]						# set initial pose in floorplan [x, y, z, theta]
+	pose [-2.6 -2 0 90]						# set initial pose in floorplan [x, y, z, theta]
+	name "ed208"							# give this instance a name
+	color "blue"							# set the colour if need be
+
+	mycamera(pose [ 0.1 0 0 0 ])			# mount an instance of a camera (in robot reference frame)
+	topurg(pose [ 0.1 0.000 -0.15 0.000 ]) 	# mount an instance of a topurg sensor (in robot reference frame)
+	topurg(pose [ 0 0.1 -0.15 90.000 ]) 	# mount an instance of a topurg sensor (in robot reference frame)
+	topurg(pose [ 0 -0.1 -0.15 -90.000 ]) 	# mount an instance of a topurg sensor (in robot reference frame)
+)
