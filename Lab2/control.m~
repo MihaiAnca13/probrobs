@@ -9,6 +9,7 @@ odom = rossubscriber('odom');
 last_pos = [0, 0, 0];
 last = 0;
 while(1)
+    
     if last_pos(1) == odom.LatestMessage.Pose.Pose.Position.X && last_pos(2) == odom.LatestMessage.Pose.Pose.Position.Y && last_pos(3) == odom.LatestMessage.Pose.Pose.Orientation.W
         [resetclient, resetmsg] = rossvcclient('/reset_positions');
         resetclient.call(resetmsg);
@@ -18,13 +19,18 @@ while(1)
     last_pos(2) = odom.LatestMessage.Pose.Pose.Position.Y;
     last_pos(3) = odom.LatestMessage.Pose.Pose.Orientation.W;
     
-    fwd = fwd_scan.LatestMessage.Ranges;
-    left = left_scan.LatestMessage.Ranges;
-    right = right_scan.LatestMessage.Ranges;
+    scan1 = fwd_scan.LatestMessage;
+    fwd = scan1.Ranges(ceil(size(scan1.Ranges,1)/2));
+    
+    scan2 = left_scan.LatestMessage.Ranges;
+    left = scan2.Ranges(ceil(size(scan2.Ranges,1)/2));
+    
+    scan3 = right_scan.LatestMessage.Ranges;
+    right = scan3.Ranges(ceil(size(scan3.Ranges,1)/2));
     
     delta = left - right;
     if (right < 2 && left < 2 && delta <= 0.2)
-        vel.Angular.Z = delta*0.85+(delta-last)*5;
+        vel.Angular.Z = delta*0.8+(delta-last)*5;
         last = delta;
     end
     
