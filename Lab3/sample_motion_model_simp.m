@@ -10,10 +10,10 @@ function [x] =  sample_motion_model_simp(u,x_1)
 %%% Return:
 % x is the current pose estimate [x y theta]
 
-alpha1 = 0.1;    % noise measured in rotation caused by rotation
-alpha2 = 0.1;    % noise measured in rotation caused by translation
-alpha3 = 0.03;    % noise measured in translation caused by translation
-alpha4 = 0.1;    % noise measured in translation caused by rotation
+alpha1 = 0.02;    % noise measured in rotation caused by rotation
+alpha2 = 0.0;    % noise measured in rotation caused by translation
+alpha3 = 0.3;    % noise measured in translation caused by translation
+alpha4 = 0.01;    % noise measured in translation caused by rotation
 
 % initialise output vector
 x= zeros(3,1);

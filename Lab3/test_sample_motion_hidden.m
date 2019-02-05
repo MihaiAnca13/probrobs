@@ -16,10 +16,12 @@ u(3,1,:)=1;
 % initial state estimate (use same for each sample)
 x_1 = [0 0 0];
 
+err=zeros(1,num_samp);
 % generate samples of transistion probability distribution
-for i=1:num_samp;
+for i=1:num_samp
     x(:,i) = sample_motion_model_hidden(u(:,:,i),x_1);
-end;
+    err(i) = abs(x(1,:,i));
+end
 
 % display the results
 figure(2)
