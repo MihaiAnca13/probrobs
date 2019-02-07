@@ -33,9 +33,9 @@ cleanerbot
 	name "ed208"							# give this instance a name
 	color "blue"							# set the colour if need be
 
-	mycamera(pose [ 0.09 0 0 0 ])			# mount an instance of a camera (in robot reference frame)
+	mycamera(pose [ 0.0 0 0 0 ])			# mount an instance of a camera (in robot reference frame)
 	topurg(pose [ 0.1 0.000 -0.15 0.000 ]) 	# mount an instance of a topurg sensor (in robot reference frame)
 	topurg(pose [ 0 0.09 -0.15 45.000 ]) 	# mount an instance of a topurg sensor (in robot reference frame)
 	topurg(pose [ 0 -0.09 -0.15 -45.000 ]) 	# mount an instance of a topurg sensor (in robot reference frame)
-	feature_detector(pose [ 0.1 0 0 0 ])	# mount a fiducial detector
+	feature_detector(pose [ 0 0 0 0 ])	# mount a fiducial detector
 )

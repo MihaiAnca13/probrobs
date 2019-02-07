@@ -8,7 +8,7 @@ define cleanerbot position
   acceleration_bounds [ -10 10 0 0 0 0 -90.0 90.0 ] # Kinematic constraint [ xmin xmax ymin ymax zmin zmax amin amax ]   
   mass 20.0                                         # Mass in KG
 
-  obstacle_return 1                                 # Can hit things.
+  obstacle_return 1                                 # Can't hit things.
   ranger_return 1                                   # reflects sonar beams
   fiducial_return 0                                 # Seen by fiducial sensors (0=not, else id)
 
