@@ -7,13 +7,14 @@ global estimate_y;
 global estimate_pose;
 global velcmd;
 global vel;
-global odom_scan;
+global robot_pose;
 
 fwd_scan = rossubscriber('base_scan_0');
 left_scan = rossubscriber('base_scan_1');
 right_scan = rossubscriber('base_scan_2');
-odom_scan = rossubscriber('odom');
+rossubscriber('odom', @OdomCallback);
 [velcmd, vel] = rospublisher('/cmd_vel');
+% rossubscriber('cmd_vel', @ModelCallback);
 
 pause(0.5);
 
@@ -24,7 +25,8 @@ coords_x = [];
 coords_y = [];
 estimate_x = [];
 estimate_y = [];
-estimate_pose = get_pose(odom_scan);
+robot_pose = [0 0 0];
+estimate_pose = robot_pose;
 
 state = 0;
 last = 0;
@@ -107,26 +109,20 @@ axis([-5 5 -2.5 2.5]);
 [resetclient, resetmsg] = rossvcclient('/reset_positions');
 resetclient.call(resetmsg);
 %%
-turn(1);
-%%
-while (1)
-    a = get_pose(odom_scan);
-    disp(a)
-end
+turn(0);
 %%
 function a = turn(dir)
-    global velcmd;
     global vel;
-    global odom_scan;
-
-    w = get_angle(odom_scan);
+    global robot_pose;
+ 
+    w = robot_pose(3);
     turn_matrix = [-3.14 -1.57 1.57; 1.57 3.14 0; 0 1.57 -1.57; -1.57 0 -3.14; 3.14 -1.57 1.57];
 
     %turn_matrix = [-1 -0.7071 0.7071; 0.7071 1 0; 0 0.7071 -0.7071; -0.7071 0 -1; 1 -0.7071 0.7071];
     
     %w = odom_scan.LatestMessage.Pose.Pose.Orientation.Z;
     
-    DELTA = 0.0005;
+    DELTA = 0.001;
     
     [val, idx]=min(abs(turn_matrix(:,1)-w));
     target = turn_matrix(idx,dir+1);
@@ -163,7 +159,7 @@ function a = turn(dir)
         end
         last = abs(w-target);
         send_cmd(0.1);
-        w = get_angle(odom_scan);
+        w = robot_pose(3);
     end
     
     vel.Angular.Z = 0;
@@ -172,7 +168,6 @@ end
 
 function b = find_middle(left_scan, right_scan, TH_D)
     global vel;
-    global velcmd;
 
     left = left_scan.LatestMessage.Ranges;
     right = right_scan.LatestMessage.Ranges;
@@ -197,44 +192,24 @@ end
 
 function c = nudge()
     global vel;
-    global velcmd;
     
     vel.Linear.X = 0.5;
     vel.Angular.Z = 0;
     send_cmd(0.3);
 end
 
-function w = get_angle(odom_scan)
-    quatern = [odom_scan.LatestMessage.Pose.Pose.Orientation.X odom_scan.LatestMessage.Pose.Pose.Orientation.Y odom_scan.LatestMessage.Pose.Pose.Orientation.Z odom_scan.LatestMessage.Pose.Pose.Orientation.W];
-    eula = quat2eul(quatern);
-    w = eula(3);
-end
-
-function p = get_pose(odom_scan)
-    p = zeros(3,1);
-    p(1) = odom_scan.LatestMessage.Pose.Pose.Position.X;
-    p(2) = odom_scan.LatestMessage.Pose.Pose.Position.Y;
-    p(3) = get_angle(odom_scan);
-end
-
 function [] = send_cmd(delay)
     global vel;
     global velcmd;
-    global odom_scan;
+    global robot_pose;
     global coords_x;
     global coords_y;
-    global estimate_x;
-    global estimate_y;
-    global estimate_pose;
-
+  
     send(velcmd, vel);
-    estimate_pose = vel_model(vel, estimate_pose, delay);
     pause(delay);
     
-    x = odom_scan.LatestMessage.Pose.Pose.Position.X;
-    y = odom_scan.LatestMessage.Pose.Pose.Position.Y;
+    x = robot_pose(1);
+    y = robot_pose(2);
     coords_x = [coords_x x];
     coords_y = [coords_y y];
-    estimate_x = [estimate_x estimate_pose(1)];
-    estimate_y = [estimate_y estimate_pose(2)];
 end
