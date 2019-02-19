@@ -39,3 +39,11 @@ cleanerbot
 	topurg(pose [ 0 -0.09 -0.15 -45.000 ]) 	# mount an instance of a topurg sensor (in robot reference frame)
 	feature_detector(pose [ 0 0 0 0 ])	# mount a fiducial detector
 )
+
+# add a fiducial marker
+#landmark
+#(
+#	name "fiducial1"						# unique name
+#	pose [-4.148 2.02 0.1 0]							# location in world frame
+#	fiducial_return 1						# fiducial id number [1 .. n]
+#)

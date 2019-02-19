@@ -8,10 +8,13 @@ global estimate_pose;
 global velcmd;
 global vel;
 global robot_pose;
+global fwd;
+global right;
+global left;
 
-fwd_scan = rossubscriber('base_scan_0');
-left_scan = rossubscriber('base_scan_1');
-right_scan = rossubscriber('base_scan_2');
+fwd_scan = rossubscriber('base_scan_0', @FwdCallback);
+left_scan = rossubscriber('base_scan_1', @LeftCallback);
+right_scan = rossubscriber('base_scan_2', @RightCallback);
 rossubscriber('odom', @OdomCallback);
 [velcmd, vel] = rospublisher('/cmd_vel');
 % rossubscriber('cmd_vel', @ModelCallback);
@@ -26,18 +29,12 @@ coords_y = [];
 estimate_x = [];
 estimate_y = [];
 robot_pose = [0 0 0];
+pause(0.5);
 estimate_pose = robot_pose;
 
 state = 0;
 last = 0;
-while(1)
-    scan = fwd_scan.LatestMessage;
-    fwd = scan.Ranges(ceil(size(scan.Ranges,1)/2));
-    scan = left_scan.LatestMessage;
-    left = scan.Ranges(ceil(size(scan.Ranges,1)/2));
-    scan = right_scan.LatestMessage;
-    right = scan.Ranges(ceil(size(scan.Ranges,1)/2));
-    
+while(1)    
     if state == 0
         delta = left - right;
         if fwd > TH_F && left < TH_D && right < TH_D
@@ -56,7 +53,7 @@ while(1)
                 state = 2;
         else
             if left > TH_D || right > TH_D
-                find_middle(left_scan, right_scan, TH_D);
+                find_middle(TH_D);
                 state = 2;
             end
         end
@@ -65,12 +62,12 @@ while(1)
         % 2 - right | 1 - left | 0 - fwd
         available_dir = [];
         if fwd > TH_F
-            available_dir = [available_dir 0 0 0];
+            available_dir = [available_dir 0];
         end
-        if left > TH_D
+        if left > 0.28
             available_dir = [available_dir 1];
         end
-        if right > TH_D
+        if right > 0.28
             available_dir = [available_dir 2];
         end
         if isempty(available_dir)
@@ -104,7 +101,7 @@ plot(coords_x, coords_y, 'r');
 axis([-5 5 -2.5 2.5]);
 figure(2);
 plot(estimate_x, estimate_y, 'b');
-axis([-5 5 -2.5 2.5]);
+axis([-7 7 -4 4]);
 %%
 [resetclient, resetmsg] = rossvcclient('/reset_positions');
 resetclient.call(resetmsg);
@@ -166,17 +163,16 @@ function a = turn(dir)
     send_cmd(0);
 end
 
-function b = find_middle(left_scan, right_scan, TH_D)
+function b = find_middle(TH_D)
     global vel;
-
-    left = left_scan.LatestMessage.Ranges;
-    right = right_scan.LatestMessage.Ranges;
+    global left;
+    global right;
     
     if right > left
         target = right;
-        scan = right_scan;
+        scan = 0;
     else
-        scan = left_scan;
+        scan = 1;
         target = left;
     end
 
@@ -185,7 +181,11 @@ function b = find_middle(left_scan, right_scan, TH_D)
     while target >= TH_D
         vel.Linear.X = target-TH_D + 0.01;
         send_cmd(0.1);
-        target = scan.LatestMessage.Ranges;
+        if scan == 0
+            target = right;
+        else
+            target = left;
+        end
     end
     vel.Angular.Z = 0;
 end
@@ -204,12 +204,20 @@ function [] = send_cmd(delay)
     global robot_pose;
     global coords_x;
     global coords_y;
+    global estimate_x;
+    global estimate_y;
+    global estimate_pose;
   
     send(velcmd, vel);
     pause(delay);
     
     x = robot_pose(1);
     y = robot_pose(2);
+    
+    estimate_pose = vel_model(vel, estimate_pose, 0.1);
+    estimate_x = [estimate_x estimate_pose(1)];
+    estimate_y = [estimate_y estimate_pose(2)];
+    
     coords_x = [coords_x x];
     coords_y = [coords_y y];
 end
