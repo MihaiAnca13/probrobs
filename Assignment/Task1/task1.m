@@ -2,9 +2,6 @@ rosinit
 %%
 global coords_x;
 global coords_y;
-global estimate_x;
-global estimate_y;
-global estimate_pose;
 global velcmd;
 global vel;
 global odom_scan;
@@ -22,9 +19,6 @@ TH_D = 0.33;
 
 coords_x = [];
 coords_y = [];
-estimate_x = [];
-estimate_y = [];
-estimate_pose = get_pose(odom_scan);
 
 state = 0;
 last = 0;
@@ -100,9 +94,6 @@ end
 figure(1);
 plot(coords_x, coords_y, 'r');
 axis([-5 5 -2.5 2.5]);
-figure(2);
-plot(estimate_x, estimate_y, 'b');
-axis([-5 5 -2.5 2.5]);
 %%
 [resetclient, resetmsg] = rossvcclient('/reset_positions');
 resetclient.call(resetmsg);
@@ -126,7 +117,7 @@ function a = turn(dir)
     
     %w = odom_scan.LatestMessage.Pose.Pose.Orientation.Z;
     
-    DELTA = 0.0005;
+    DELTA = 0.001;
     
     [val, idx]=min(abs(turn_matrix(:,1)-w));
     target = turn_matrix(idx,dir+1);
@@ -223,18 +214,12 @@ function [] = send_cmd(delay)
     global odom_scan;
     global coords_x;
     global coords_y;
-    global estimate_x;
-    global estimate_y;
-    global estimate_pose;
 
     send(velcmd, vel);
-    estimate_pose = vel_model(vel, estimate_pose, delay);
     pause(delay);
     
     x = odom_scan.LatestMessage.Pose.Pose.Position.X;
     y = odom_scan.LatestMessage.Pose.Pose.Position.Y;
     coords_x = [coords_x x];
     coords_y = [coords_y y];
-    estimate_x = [estimate_x estimate_pose(1)];
-    estimate_y = [estimate_y estimate_pose(2)];
 end
