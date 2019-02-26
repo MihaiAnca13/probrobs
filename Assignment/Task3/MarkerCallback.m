@@ -3,7 +3,7 @@ function ROSMarkerCallback(~, message)
     global NoisyMarkers;
     global Features;
     
-    variance = 0.00;
+    variance = 0.001;
     
     NoisyMarkers = zeros(2,NumMarkers);
     Features = zeros(2,NumMarkers);
@@ -13,8 +13,8 @@ function ROSMarkerCallback(~, message)
         x = message.Markers(num).Pose.Position.X;
         y = message.Markers(num).Pose.Position.Y;
         
-%         x = x + sample_norm(variance);
-%         y = y + sample_norm(variance);
+        x = x + sample_norm(variance);
+        y = y + sample_norm(variance);
         
         NoisyMarkers(1, message.Markers(num).Ids) = x;
         NoisyMarkers(2, message.Markers(num).Ids) = y;

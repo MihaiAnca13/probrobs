@@ -41,9 +41,21 @@ cleanerbot
 )
 
 # add a fiducial marker
-#landmark
-#(
-#	name "fiducial1"						# unique name
-#	pose [-4.148 2.02 0.1 0]							# location in world frame
-#	fiducial_return 1						# fiducial id number [1 .. n]
-#)
+landmark
+(
+	name "fiducial1"						# unique name
+	pose [-4.148 2.02 0.1 0]							# location in world frame
+	fiducial_return 1						# fiducial id number [1 .. n]
+)
+landmark
+(
+	name "fiducial2"						# unique name
+	pose [0.652 2 0.1 0]							# location in world frame
+	fiducial_return 2						# fiducial id number [1 .. n]
+)
+landmark
+(
+	name "fiducial3"						# unique name
+	pose [3.278 0.348 0.1 0]							# location in world frame
+	fiducial_return 3						# fiducial id number [1 .. n]
+)

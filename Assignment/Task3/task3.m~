@@ -103,18 +103,11 @@ while(1)
 end
 %%
 figure;
-subplot(2,1,1);
 plot(coords_x, coords_y, 'r');
-hold on;
-plot(landmarks(:,1), landmarks(:,2), 'o');
-hold off;
 axis([-5 5 -2.5 2.5]);
-subplot(2,1,2);
+figur
 plot(estimate_x, estimate_y, 'b');
-hold on;
-plot(landmarks(:,1), landmarks(:,2), 'o');
-hold off;
-axis([-5 5 -2.5 2.5]);
+axis([-7 7 -4 4]);
 %%
 [resetclient, resetmsg] = rossvcclient('/reset_positions');
 resetclient.call(resetmsg);

@@ -20,5 +20,6 @@ function pose = vel_model(vel, last_pose, delta_t)
         pose(1) = last_pose(1) + -v_cap/w_cap*sin(last_pose(3)) + v_cap/w_cap*sin(last_pose(3)+w_cap*delta_t);
         pose(2) = last_pose(2) + v_cap/w_cap*cos(last_pose(3)) - v_cap/w_cap*cos(last_pose(3)+w_cap*delta_t);
         pose(3) = last_pose(3) + (w_cap + sample_norm(a5)*v^2 + sample_norm(a6)*w^2)*delta_t;
+        pose(3) = wrapToPi(pose(3))
     end
 end
