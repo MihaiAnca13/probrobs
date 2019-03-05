@@ -1,10 +1,16 @@
 load('data.mat');
+load('data_features.mat');
 %%
 global data;
 global vel;
+global data_features;
+landmarks = [2.567 2.007; 0.652 2; 3.278 0.348; -1.286 2.003; -3.2 2.003; -4.157 -2.004; -2.206 -2.004; -0.333 -2.004; 1.597 -2.004];
 miu = [4.5 2.2 3.1416];
 sigma = zeros(3,3);
 pose_data = zeros(length(data),3);
+
+Qt = [0.01 0 0; 0 0.01 0; 0 0 0.01];
+Qt = Qt.^2;
 
 for i = 1:length(data)
     vel.Linear.X = data(i,1);
@@ -21,7 +27,19 @@ for i = 1:length(data)
     sigma_cap = Gt*sigma*Gt'+Rt;
     
     %update step
-    
+    observed_features = data_features(2*i-1:2*i,:);
+    for j = 1:length(3)
+        features = observed_features(:,j);
+        if sum(features) > 0
+    %         q = landmark_model_known_correspondence(features, j, miu, landmarks)
+            q = (landmarks(j,1)-miu_cap(1))^2+(landmarks(j,2)-miu_cap(2))^2;
+            zt_cap = atan2(landmarks(j,2)-miu_cap(2), landmarks(j,1)-miu_cap(1))-miu_cap(3);
+            Ht = calculate_Ht(miu_cap, landmarks(j,:), q);
+            Kt = sigma_cap*Ht'*(Ht*sigma_cap*Ht'+Qt)';
+%             miu_cap = miu_cap + Kt();
+%             sigma_cap = ;
+        end
+    end
     
     %overwrite old values
     sigma = sigma_cap;
@@ -80,4 +98,20 @@ function Rt = calculate_Rt(miu_1, u)
     Vt(3,2) = delta_t;
     
     Rt = Vt*Mt*Vt';
+end
+
+% function q = landmark_model_known_correspondence(features, j, miu, m)
+%     r_hat = sqrt(m(j,1)-miu(1)^2 + (m(j,2)-miu(2))^2);
+%     theta_hat = atan2(m(j,2)-miu(2), m(j,1)-miu(1))-miu(3);
+%     sigma = 0.001;
+%     q = gaussmf(features(2)-r_hat, [sigma 0])*gaussmf(features(1)-theta_hat, [sigma 0]);
+% end
+
+function Ht = calculate_Ht(miu, landmark, q)
+    a1 = -(landmark(1)-miu(1))/sqrt(q);
+    a2 = -(landmark(2)-miu(2))/sqrt(q);
+    a3 = (landmark(2)-miu(2))/q;
+    a4 = -(landmark(1)-miu(1))/q;
+    
+    Ht = [a1 a2 0; a3 a4 -1; 0 0 0];
 end

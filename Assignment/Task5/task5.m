@@ -12,12 +12,13 @@ global fwd;
 global right;
 global left;
 global NumMarkers;
-global Features;
 global landmarks;
 global data;
+global data_features;
 
 data = [];
-landmarks = [-4.148 2.02; 0.652 2; 3.278 0.348];
+data_features = [];
+landmarks = [2.567 2.007; 0.652 2; 3.278 0.348; -1.286 2.003; -3.2 2.003; -4.157 -2.004; -2.206 -2.004; -0.333 -2.004; 1.597 -2.004];
 
 fwd_scan = rossubscriber('base_scan_0', @FwdCallback);
 left_scan = rossubscriber('base_scan_1', @LeftCallback);
@@ -35,7 +36,7 @@ coords_x = [];
 coords_y = [];
 estimate_x = [];
 estimate_y = [];
-NumMarkers = 1;
+NumMarkers = 9;
 robot_pose = [0 0 0];
 pause(0.5);
 estimate_pose = robot_pose;
@@ -223,8 +224,11 @@ function [] = send_cmd(delay)
     global estimate_y;
     global estimate_pose;
     global data;
+    global Features;
+    global data_features;
     
     data = [data; [vel.Linear.X vel.Angular.Z]];
+    data_features = [data_features; Features];
   
     send(velcmd, vel);
     pause(delay);

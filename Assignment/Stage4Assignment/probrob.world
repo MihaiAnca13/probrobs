@@ -44,7 +44,7 @@ cleanerbot
 landmark
 (
 	name "fiducial1"						# unique name
-	pose [-4.148 2.02 0.1 0]							# location in world frame
+	pose [2.567 2.007 0.1 0]							# location in world frame
 	fiducial_return 1						# fiducial id number [1 .. n]
 )
 landmark
@@ -58,4 +58,40 @@ landmark
 	name "fiducial3"						# unique name
 	pose [3.278 0.348 0.1 0]							# location in world frame
 	fiducial_return 3						# fiducial id number [1 .. n]
+)
+landmark
+(
+	name "fiducial4"						# unique name
+	pose [-1.286 2.003 0.1 0]							# location in world frame
+	fiducial_return 4						# fiducial id number [1 .. n]
+)
+landmark
+(
+	name "fiducial5"						# unique name
+	pose [-3.2 2.003 0.1 0]							# location in world frame
+	fiducial_return 5						# fiducial id number [1 .. n]
+)
+landmark
+(
+	name "fiducial6"						# unique name
+	pose [-4.157 -2.004 0.1 0]							# location in world frame
+	fiducial_return 6						# fiducial id number [1 .. n]
+)
+landmark
+(
+	name "fiducial7"						# unique name
+	pose [-2.206 -2.004 0.1 0]							# location in world frame
+	fiducial_return 7						# fiducial id number [1 .. n]
+)
+landmark
+(
+	name "fiducial8"						# unique name
+	pose [-0.333 -2.004 0.1 0]							# location in world frame
+	fiducial_return 8						# fiducial id number [1 .. n]
+)
+landmark
+(
+	name "fiducial9"						# unique name
+	pose [1.597 -2.004 0.1 0]							# location in world frame
+	fiducial_return 9						# fiducial id number [1 .. n]
 )
