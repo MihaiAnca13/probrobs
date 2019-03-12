@@ -1,16 +1,20 @@
 load('data.mat');
 load('data_features.mat');
+load('odom_data.mat');
+load('estimate_data.mat');
 %%
 global data;
 global vel;
 global data_features;
 landmarks = [2.567 2.007; 0.652 2; 3.278 0.348; -1.286 2.003; -3.2 2.003; -4.157 -2.004; -2.206 -2.004; -0.333 -2.004; 1.597 -2.004];
-miu = [4.5 2.2 3.1416];
+miu = [4.5; 2.2; 3.1416];
 sigma = zeros(3,3);
 pose_data = zeros(length(data),3);
 
-Qt = [0.01 0 0; 0 0.01 0; 0 0 0.01];
-Qt = Qt.^2;
+a5 = 0.01;
+a6 = 0.01;
+Qt = [a5 0 0; 0 a6 0; 0 0 0.01];
+% Qt = Qt.^2;
 
 for i = 1:length(data)
     vel.Linear.X = data(i,1);
@@ -28,16 +32,17 @@ for i = 1:length(data)
     
     %update step
     observed_features = data_features(2*i-1:2*i,:);
-    for j = 1:length(3)
-        features = observed_features(:,j);
-        if sum(features) > 0
+    for j = 1:length(observed_features)
+        zt = [observed_features(:,j);0];
+        if sum(zt) > 0
     %         q = landmark_model_known_correspondence(features, j, miu, landmarks)
             q = (landmarks(j,1)-miu_cap(1))^2+(landmarks(j,2)-miu_cap(2))^2;
-            zt_cap = atan2(landmarks(j,2)-miu_cap(2), landmarks(j,1)-miu_cap(1))-miu_cap(3);
+            zt_cap = [sqrt(q); atan2(landmarks(j,2)-miu_cap(2), landmarks(j,1)-miu_cap(1))-miu_cap(3);0];
+            zt_cap(2) = wrapToPi(zt_cap(2));
             Ht = calculate_Ht(miu_cap, landmarks(j,:), q);
-            Kt = sigma_cap*Ht'*(Ht*sigma_cap*Ht'+Qt)';
-%             miu_cap = miu_cap + Kt();
-%             sigma_cap = ;
+            Kt = sigma_cap*Ht'* pinv(Ht*sigma_cap*Ht'+Qt);
+            miu_cap = miu_cap + (Kt*(zt-zt_cap));
+            sigma_cap = (eye(3)-Kt*Ht)*sigma_cap;
         end
     end
     
@@ -49,12 +54,27 @@ for i = 1:length(data)
 end
 
 figure;
+subplot(3,1,1);
 plot(pose_data(:,1), pose_data(:,2), 'r');
+hold on;
+plot(landmarks(:,1), landmarks(:,2), 'o');
+hold off;
 axis([-5 5 -2.5 2.5]);
-
+subplot(3,1,2);
+plot(odom_data(:,1), odom_data(:,2), 'r');
+hold on;
+plot(landmarks(:,1), landmarks(:,2), 'o');
+hold off;
+axis([-5 5 -2.5 2.5]);
+subplot(3,1,3);
+plot(estimate_data(:,1), estimate_data(:,2), 'r');
+hold on;
+plot(landmarks(:,1), landmarks(:,2), 'o');
+hold off;
+axis([-5 5 -2.5 2.5]);
 %%
 function miu = g(miu_1, u)
-    miu = [0 0 0];
+    miu = [0; 0; 0];
     delta_t=0.1;
     
     v = u.Linear.X;

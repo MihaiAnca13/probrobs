@@ -118,6 +118,17 @@ hold on;
 plot(landmarks(:,1), landmarks(:,2), 'o');
 hold off;
 axis([-5 5 -2.5 2.5]);
+%% save stuff
+estimate_data = [];
+estimate_data(:,1) = estimate_x;
+estimate_data(:,2) = estimate_y;
+odom_data = [];
+odom_data(:,1) = coords_x;
+odom_data(:,2) = coords_y;
+save('data','data');
+save('estimate_data','estimate_data');
+save('odom_data','odom_data');
+save('data_features','data_features');
 %%
 [resetclient, resetmsg] = rossvcclient('/reset_positions');
 resetclient.call(resetmsg);

@@ -19,8 +19,8 @@ function ROSMarkerCallback(~, message)
         NoisyMarkers(1, message.Markers(num).Ids) = x_hat;
         NoisyMarkers(2, message.Markers(num).Ids) = y_hat;
         
-        Features(1, message.Markers(num).Ids) = atan2(y, x); % bearing
-        Features(2, message.Markers(num).Ids) = sqrt(x^2 + y^2); % range
+        Features(1, message.Markers(num).Ids) = sqrt(x^2 + y^2); % range
+        Features(2, message.Markers(num).Ids) = atan2(y, x); % bearing
         
         num=num-1;
     end
