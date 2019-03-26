@@ -9,14 +9,14 @@ global data_features;
 landmarks = [2.567 2.007; 0.652 2; 3.278 0.348; -1.286 2.003; -3.2 2.003; -4.157 -2.004; -2.206 -2.004; -0.333 -2.004; 1.597 -2.004];
 miu = [4.5; 2.2; 3.1416];
 sigma = zeros(3,3);
-pose_data = zeros(length(data),3);
+pose_data = zeros(length(data)-1,3);
 
 a5 = 0.01;
 a6 = 0.01;
 Qt = [a5 0 0; 0 a6 0; 0 0 0.01];
 % Qt = Qt.^2;
 
-for i = 1:length(data)
+for i = 1:length(data)-1
     vel.Linear.X = data(i,1);
     vel.Angular.Z = data(i,2);
    
@@ -35,7 +35,6 @@ for i = 1:length(data)
     for j = 1:length(observed_features)
         zt = [observed_features(:,j);0];
         if sum(zt) > 0
-    %         q = landmark_model_known_correspondence(features, j, miu, landmarks)
             q = (landmarks(j,1)-miu_cap(1))^2+(landmarks(j,2)-miu_cap(2))^2;
             zt_cap = [sqrt(q); atan2(landmarks(j,2)-miu_cap(2), landmarks(j,1)-miu_cap(1))-miu_cap(3);0];
             zt_cap(2) = wrapToPi(zt_cap(2));
@@ -53,7 +52,8 @@ for i = 1:length(data)
     pose_data(i,:) = miu;
 end
 
-figure;
+% plot trajectories
+figure(1);
 subplot(3,1,1);
 plot(pose_data(:,1), pose_data(:,2), 'r');
 hold on;
@@ -72,6 +72,20 @@ hold on;
 plot(landmarks(:,1), landmarks(:,2), 'o');
 hold off;
 axis([-5 5 -2.5 2.5]);
+
+% fix pose_data
+% pose_data = [[4.5 2.2 3.1416]; pose_data];
+% pose_data = pose_data(1:end-2,:);
+
+rme_vel = sqrt((estimate_data(:,1) - odom_data(:,1)).^2 + (estimate_data(:,2) - odom_data(:,2)).^2);
+rme_ekf = sqrt((pose_data(:,1) - odom_data(:,1)).^2 + (pose_data(:,2) - odom_data(:,2)).^2);
+dl = size(rme_vel,1);
+
+figure(2);
+subplot(2,1,1);
+plot(1:dl, rme_vel, 'r');
+subplot(2,1,2);
+plot(1:dl, rme_ekf, 'b');
 %%
 function miu = g(miu_1, u)
     miu = [0; 0; 0];

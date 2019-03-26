@@ -71,7 +71,7 @@ while(1)
         % 2 - right | 1 - left | 0 - fwd
         available_dir = [];
         if fwd > TH_F
-            available_dir = [available_dir 0];
+            available_dir = [available_dir 0 0 0];
         end
         if left > 0.28
             available_dir = [available_dir 1];
