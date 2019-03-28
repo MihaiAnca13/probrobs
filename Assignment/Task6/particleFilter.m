@@ -39,7 +39,7 @@ for i = 1:length(data)-1
     wt = ones(NR_PARTICLES, 1);
     for p = 1:NR_PARTICLES
         % get velocity model prediction
-        particles(p,:) = vel_model(vel, particles(p,:));
+        particles(p,:) = vel_model(vel, particles.(p,:));
         
         % for each observed feature by the robot
         observed_features = data_features(2*i-1:2*i,:);

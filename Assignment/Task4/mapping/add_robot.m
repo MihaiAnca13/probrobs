@@ -4,7 +4,7 @@ alpha_real = 0.05;
 alpha = alpha_real/scale;  % half size of assumed minimum sensed object (m/scale = cells)
 robot_rad = 0.1;    % radius of round robot (m)
 z_max = 2;          % maximum range of sensor (m)
-fov = 30*(pi/180);  % field of view of sensor cone (rad) (Beta)
+fov = 10*(pi/180);  % field of view of sensor cone (rad) (Beta)
 
 robot_rad_cells=round(robot_rad/scale); % how many cells wide is the robot
 z_max_cells = round(z_max/scale);       % how many cells is the max range of the sensor
@@ -41,7 +41,7 @@ for k=1:length(ranges)          % for each sensor measurement in observation
 		for j=index(3):index(4)     % }
 			
 			[r phi] = cart2pol(sensor_pose_G(1:2),[i j]);   % get polar coordinates of cell from sensor base
-			
+			 
 			if cos(phi-sensor_pose_G(3)) > cos(fov/2)	% check that bearing to cell is within the fov of the sensor
 				
 				if nothing_detected

@@ -20,7 +20,7 @@ dimy = round(Env_size_y/scale);   % find number of cells in y-dimension
 % initialise map to prior occupancy
 map = prior*ones(dimx,dimy);
 
-%offset used for odometry
+% offset used for odometry
 % odom is between -4.8 and 4.8 | -2.9 and 2.9
 % this is equivalent to -96 to 96 | -58 to 58
 % 0-40 and 240-280 | 0-40 and 160-200 are sensor max ranges
@@ -35,7 +35,7 @@ odometry(:,2)=odometry(:,2)/scale; % convert y to cell scale
 figure(3)
 clf;
 
-%step through data set, update map and display
+% step through data set, update map and display
 for(x=1:numits)
     pose=odometry(x,:)+offset;
     map = add_robot(pose, map, scale, l_free, l_occ, l_prior, ranges(x,:));
@@ -44,7 +44,7 @@ for(x=1:numits)
     xlabel('x-axis');
     ylabel('y-axis');
     drawnow
-    pause(0.01)
+    pause(0.001)
 end
 
 

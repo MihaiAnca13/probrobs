@@ -54,38 +54,23 @@ end
 
 % plot trajectories
 figure(1);
-subplot(3,1,1);
 plot(pose_data(:,1), pose_data(:,2), 'r');
 hold on;
+plot(odom_data(:,1), odom_data(:,2), 'b');
+plot(estimate_data(:,1), estimate_data(:,2), 'k');
 plot(landmarks(:,1), landmarks(:,2), 'o');
-hold off;
-axis([-5 5 -2.5 2.5]);
-subplot(3,1,2);
-plot(odom_data(:,1), odom_data(:,2), 'r');
-hold on;
-plot(landmarks(:,1), landmarks(:,2), 'o');
-hold off;
-axis([-5 5 -2.5 2.5]);
-subplot(3,1,3);
-plot(estimate_data(:,1), estimate_data(:,2), 'r');
-hold on;
-plot(landmarks(:,1), landmarks(:,2), 'o');
-hold off;
-axis([-5 5 -2.5 2.5]);
-
-% fix pose_data
-% pose_data = [[4.5 2.2 3.1416]; pose_data];
-% pose_data = pose_data(1:end-2,:);
+legend('EKF','Ground truth', 'Vel model', 'Landmarks');
+% axis([-5 5 -2.5 2.5]);
 
 rme_vel = sqrt((estimate_data(:,1) - odom_data(:,1)).^2 + (estimate_data(:,2) - odom_data(:,2)).^2);
 rme_ekf = sqrt((pose_data(:,1) - odom_data(:,1)).^2 + (pose_data(:,2) - odom_data(:,2)).^2);
 dl = size(rme_vel,1);
 
 figure(2);
-subplot(2,1,1);
 plot(1:dl, rme_vel, 'r');
-subplot(2,1,2);
+hold on;
 plot(1:dl, rme_ekf, 'b');
+legend('Velocity', 'EKF');
 %%
 function miu = g(miu_1, u)
     miu = [0; 0; 0];

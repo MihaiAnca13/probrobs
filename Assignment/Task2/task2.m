@@ -1,5 +1,6 @@
 rosinit
 %%
+% initialize global variables
 global coords_x;
 global coords_y;
 global estimate_x;
@@ -99,9 +100,8 @@ end
 figure(1);
 plot(coords_x, coords_y, 'r');
 axis([-5 5 -2.5 2.5]);
-figure(2);
+hold on
 plot(estimate_x, estimate_y, 'b');
-axis([-7 7 -4 4]);
 %%
 [resetclient, resetmsg] = rossvcclient('/reset_positions');
 resetclient.call(resetmsg);
